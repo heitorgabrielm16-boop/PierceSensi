@@ -1,0 +1,36 @@
+name: Gerar APK Pierce Sensi
+on:
+workflow_dispatch:
+push:
+branches: [main]
+
+jobs:
+build:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v4
+
+  - uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: '17'
+
+  - uses: android-actions/setup-android@v3
+
+  - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+  - name: Extrair projeto
+    run: unzip -q PierceSensi_Projeto_Android_com_build_na_nuvem.zip
+
+  - uses: gradle/actions/setup-gradle@v4
+    with:
+      gradle-version: '8.7'
+
+  - name: Compilar APK
+    working-directory: PierceSensiAndroid
+    run: gradle assembleDebug
+
+  - uses: actions/upload-artifact@v4
+    with:
+      name: Pierce-Sensi-APK
+      path: PierceSensiAndroid/app/build/outputs/apk/debug/app-debug.apk
